@@ -44,11 +44,15 @@ classdef Func
               for i=1:numel(variables)
                   dataErrorList{i}=0;
               end
+              %if no error parameters have been given, then zero all
+              %parameters since the error is 0
           else
               if numel(dataErrorList)<numel(variables)
                   error(['number of input error parameters must be - ' num2str(numel(variables))]);
               end
           end
+          %change the function and the function error operations to
+          %"cell to cell" operations
           fun=char(self.func);
           fun=strrep(fun,'*','.*');
           fun=strrep(fun,'^','.^');
@@ -62,13 +66,11 @@ classdef Func
             fun=regexprep(fun,['\<' var '\>'],['dataList{' num2str(i) '}']);
             funError=regexprep(funError,['\<' var '\>'],['dataList{' num2str(i) '}']);
             funError=regexprep(funError,['\<' 'z_' var '\>'],['dataErrorList{' num2str(i) '}']);
+            %replace variable with parameter
           end
           resultFunc=eval(fun);
           resultFuncError=eval(funError);
-          %replace function variables with "dimentioned" data and then
-          %evaluate string as if it was a command line
-          %eval(regexprep(char(self.funcError),['\<' char(symvar(self.funcError)) '\>'],num2str(dataList))
-
+          %evaluate string as if it was a command
       end
           
   end
