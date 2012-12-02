@@ -10,6 +10,8 @@ classdef Vector
     % This are the properties of the object
     methods (Static) 
         function singleton = getUnitsStruct
+        %this static method hold the "units" object for all object of class
+        %Vector
              persistent unitStruct;
              if isempty(unitStruct)
                 unitStruct = units;
@@ -17,72 +19,102 @@ classdef Vector
              singleton = unitStruct;
         end
     end
-    %this static method hold the "units" object for all object of class
-    %Vector
+
     methods
         function self=Vector(name,unit,data,dataError)
+        %this method constructs the Vector's instances by recieving field
+        %name, unit, data, and data Error. name is saved as it is, while
+        %data,error, and unit are changed to "Dimention Variable" type
+        %which a type that considers the unit when computing.
             if nargin==3
-                dataError=zeros(numel(data));
+                dataError=zeros(numel(data),1);
             end
             if ~strcmp(class(name),'char')
                 error('name must be a char type,reminder: arguments must be (name,unit,data,error)')
             elseif ~strcmp(class(unit),'char')
                 error('unit must be a char type,reminder: arguments must be (name,unit,data,error)')
             elseif ~strcmp(class(data),'double')
-                error('name must be a double type,reminder: arguments must be (name,unit,data,error)')
+                error('data must be a double type,reminder: arguments must be (name,unit,data,error)')
             elseif ~strcmp(class(dataError),'double')
-                error('name must be a double type,reminder: arguments must be (name,unit,data,error)')
+                error('error must be a double type,reminder: arguments must be (name,unit,data,error)')
             end
-            u=self.getUnitsStruct;
-            availableUnits=fieldnames(u);
-            [matchStart matches] = regexp(unit, '[a-z]+|[A-Z]','start','match');
-            matchIndex=getnameidx(availableUnits,matches);
-            if any(matchIndex==0)
-                unmatchedUnitsIndexes=find(matchIndex==0);
-                firstUnmatched=matches{unmatchedUnitsIndexes(1)};
-                error(['error, unit is not recognizable: "' firstUnmatched '"']);
+            if ~iscolumn(dataError)
+                dataError=dataError';
             end
-            if numel(matchStart)==1&&matchStart(1)==1
-                    st=['u.' unit];
-            else
-                if matchStart(1)==1
-                        st=['u.' unit(1:(matchStart(2)-1))];
+            if ~iscolumn(data)
+                data=data';
+            end
+            if numel(unit)>0     
+                u=self.getUnitsStruct;
+                availableUnits=fieldnames(u);
+                [matchStart matches] = regexp(unit, '[a-z]+|[A-Z]','start','match');
+                matchIndex=getnameidx(availableUnits,matches);
+                if any(matchIndex==0)
+                    unmatchedUnitsIndexes=find(matchIndex==0);
+                    firstUnmatched=matches{unmatchedUnitsIndexes(1)};
+                    error(['error, unit is not recognizable: "' firstUnmatched '"']);
+                end
+                if numel(matchStart)==1&&matchStart(1)==1
+                        st=['u.' unit];
                 else
-                    st=unit(1:(matchStart(1)-1));
+                    if matchStart(1)==1
+                            st=['u.' unit(1:(matchStart(2)-1))];
+                    else
+                        st=unit(1:(matchStart(1)-1));
+                    end
+                    for i=1:(numel(matchStart)-1)
+                        st=[st 'u.' unit(matchStart(i):(matchStart(i+1)-1))];
+                    end
+                     st=[st 'u.' unit(matchStart(numel(matchStart)):numel(unit))];
                 end
-                for i=1:(numel(matchStart)-1)
-                    st=[st 'u.' unit(matchStart(i):(matchStart(i+1)-1))];
-                end
-                 st=[st 'u.' unit(matchStart(numel(matchStart)):numel(unit))];
+                unitVal=eval(st);
+            else
+                unitVal=1;
             end
-            st
-            unitVal=eval(st);
             self.unit=unitVal;
             self.data=data*unitVal;
             self.dataError=dataError*unitVal;
             self.name=name;
         end
-        %this method constructs the Vector's instances by recieving field
-        %name, unit, data, and data Error. name is saved as it is, while
-        %data,error, and unit are changed to "Dimention Variable" type
-        %which a type that considers the unit when computing.
-        function data=get(self)
-            data=self.data;
-        end
-        function num=getNum(self)
-            num=self.data/self.unit;
-        end
+        
         function name=getName(self)
+        %returns the name of the Vector
             name=self.name;
         end
-        function uni=getUnit(self)
-            [crap un]=unitsOf(self.data);
-            un=un(2:numel(un)-1);
-            uni=char(sym(regexprep(un,'][','*')));
+        
+        function data=get(self)
+        %returns data in dimentsioned type
+            data=self.data;
         end
         function err=getError(self)
+        %returns data error in dimentsioned type
             err=self.dataError;
         end
+        function num=getNum(self)
+        %returns data in double type, this value is measured in the units
+        %of the Vector.
+            num=self.data/self.unit;
+        end
+        
+        function errorNum=getErrorNum(self)
+        %returns data error in double type, this value is measured in the units
+        %of the Vector.
+            errorNum=self.dataError/self.unit;
+        end
+        
+        
+        function uni=getUnit(self)
+        %returns the value of the unit as a dimensioned variable
+            if strcmp(class(self.data),'DimensionedVariable')
+                [crap un]=unitsOf(self.data);
+                un=un(units2:numel(un)-1);
+                uni=char(sym(regexprep(un,'][','*')));
+            elseif strcmp(class(self.data),'double')
+                uni='';
+            end
+        
+        end
+
             
     end
     
