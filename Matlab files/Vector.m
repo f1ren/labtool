@@ -82,13 +82,12 @@ classdef Vector
             name=self.name;
         end
         
-        function data=get(self)
-        %returns data in dimentsioned type
+        function [data dataError]=get(self)
+        %returns data and error in dimentsioned type
+        %to get data alone type "data=Vector.get"
+        %to get both data and error type "[data dataError]=Vector.get"
             data=self.data;
-        end
-        function err=getError(self)
-        %returns data error in dimentsioned type
-            err=self.dataError;
+            dataError=self.dataError;
         end
         function num=getNum(self)
         %returns data in double type, this value is measured in the units
@@ -111,12 +110,8 @@ classdef Vector
                 uni=char(sym(regexprep(un,'][','*')));
             elseif strcmp(class(self.data),'double')
                 uni='';
-            end
-        
-        end
-
-            
-    end
-    
+            end   
+        end          
+    end   
 end
 

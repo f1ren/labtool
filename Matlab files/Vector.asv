@@ -27,7 +27,7 @@ classdef Vector
         %data,error, and unit are changed to "Dimention Variable" type
         %which a type that considers the unit when computing.
             if nargin==3
-                dataError=zeros(numel(data));
+                dataError=zeros(numel(data),1);
             end
             if ~strcmp(class(name),'char')
                 error('name must be a char type,reminder: arguments must be (name,unit,data,error)')
@@ -77,20 +77,31 @@ classdef Vector
             self.name=name;
         end
         
-        function data=get(self)
-        %returns data in dimentsioned type
-            data=self.data;
+        function name=getName(self)
+        %returns the name of the Vector
+            name=self.name;
         end
-       
+        
+        function [data dataError]=get(self)
+        %returns data and error in dimentsioned type
+        %to get data alone type "data=Vector.ger"
+        %to get v
+            data=self.data;
+            dataError=self.dataError;
+        end
         function num=getNum(self)
         %returns data in double type, this value is measured in the units
         %of the Vector.
             num=self.data/self.unit;
         end
         
-        function name=getName(self)
-            name=self.name;
+        function errorNum=getErrorNum(self)
+        %returns data error in double type, this value is measured in the units
+        %of the Vector.
+            errorNum=self.dataError/self.unit;
         end
+        
+        
         function uni=getUnit(self)
         %returns the value of the unit as a dimensioned variable
             if strcmp(class(self.data),'DimensionedVariable')
@@ -99,14 +110,8 @@ classdef Vector
                 uni=char(sym(regexprep(un,'][','*')));
             elseif strcmp(class(self.data),'double')
                 uni='';
-            end
-        
-        end
-        function err=getError(self)
-            err=self.dataError;
-        end
-            
-    end
-    
+            end   
+        end          
+    end   
 end
 

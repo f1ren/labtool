@@ -41,10 +41,13 @@ classdef Func
       %data List is a list of columns or rows, for example dataList={a b c}
       %where a,b,c are either columns or rows.
       %errordataList is the same as dataList, only it is optional wether
-      %you wish to calculate error as well
+      %you wish to calculate error as well.
+      %NOTICE - it is very important to keep the input lists syncronous to
+      %those of the function, to see the right order use the "getVariables"
+      %method
           variables=symvar(self.func);
           if numel(dataList)~=numel(variables)
-              error(['number of input parameters must be - ' num2str(numel(variables))]);
+              error(['number of input parameters(function input) must be - ' num2str(numel(variables))]);
           end
           if nargin<3
               for i=1:numel(variables)
@@ -54,7 +57,7 @@ classdef Func
               %parameters since the error is 0
           else
               if numel(dataErrorList)<numel(variables)
-                  error(['number of input error parameters must be - ' num2str(numel(variables))]);
+                  error(['number of input error parameters(function input) must be - ' num2str(numel(variables))]);
               end
           end
           %change the function and the function error operations to
@@ -78,7 +81,16 @@ classdef Func
           resultFuncError=eval(funError);
           %evaluate string as if it was a command
       end
-        
+      
+      function name=getName(self)
+      %returns the name of the function
+          name=self.name;
+      end
+      
+      function funcVar=getVariables(self)
+      %returns the variables of the function 
+          funcVar=symvar(self.func);
+      end
           
   end
 end  

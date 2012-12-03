@@ -58,11 +58,74 @@ classdef Experiment<handle
             elseif nargin==3
                 [dataTable textTable]=xlsread(xlFile,sheetName);
             end
-            %in construction
-            
-            
-                
+            headlines=textTable(1,:);
+            i=1;
+            numberOfVectors=numel(headlines);
+            while i<=numberOfVectors
+                headline=headlines{i};
+                dataVector=dataTable(:,1);
+                vectorName=char(regexp(headline,'^.*(?=\()','match'));%extracts the name 
+                vectorUnit=char(regexp(headline,'(?<=\()\w*(?=\))','match'));%extracts the unit from the brackets
+                if numel(vectorName)==0||numel(vectorUnit)==0;
+                    error(['name or unit of ' headline 'is not valid']);
+                end
+                if i<numberOfVectors
+                    if strcmp(headlines{i+1},'error')
+                        errorVector=dataTable(i+1);
+                        self.add(Vector(vectorName,vectorUnit,dataVector,errorVector),vectorName);%add vector with error, on the condition that the next column headline is "error"
+                        i=i+2;
+                   
+                    else
+                        self.add(Vector(vectorName,vectorUnit,dataVector),vectorName);%add without error
+                        i=i+1;  
+                    end
+                else
+                    self.add(Vector(vectorName,vectorUnit,dataVector),vectorName); %add without error(edge of iteration handeling)
+                    i=i+1;
+                end
+            end       
         end
+        
+        function disp(self) 
+        %default display
+            fprintf('Experiment "%s" contains the following items: \n',self.name);
+            items=self.dict.values;
+            for i=1:numel(items)
+                fprintf('>%s\n',items{i}.getName);
+            end
+        end
+        
+        function item=get(self,itemName)
+        %returns an item by the keyword of the item
+            item=self.dict(itemName);
+        end
+        
+        function keys=getKeywords(self)
+        %returns all keys in one array
+            keys=self.dict.keys';
+        end
+        
+        function [result resultError]=calc(self,funcKey,vectorKeys)
+        %this function calculates a function(using Func class "calc" method"
+        %by a function and Vectors by their keywords.
+        %syntax- [result resultError]=Experiment.calc(self,funcKey,vectorKeys)
+        %funcKey - the key of the function to calculate
+        %vectorKeys - is an array of the keys of the vectors you wish to
+        %             calculate.       
+            dataList={};
+            dataErrorList={};
+            for i=1:numel(vectorKeys)
+                key=vectorKeys{i};
+                item=self.dict(key);
+                if strcmp(class(item),'Vector')==0
+                    error('vectorKeys must direct to Vector items');
+                end
+                [data dataError]=item.get;
+                dataList=[dataList data];
+                dataErrorList=[dataErrorList dataError];
+            end
+            [result resultError]=self.dict(funcKey).calc(dataList,dataErrorList);
+            end
     end
     
         

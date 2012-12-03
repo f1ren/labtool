@@ -1,8 +1,6 @@
 classdef Func
   %This class implements a function. upon construction it calculates the
   %error propogation function.
-  %
-  %dependencies: calcError function
   properties(SetAccess=private)
       name % The name of the function
       func % The function itself  as a symbolic type
@@ -39,9 +37,11 @@ classdef Func
       end
       function [resultFunc resultFuncError]=calc(self,dataList,dataErrorList)
       %calculate the function by giving it parameters
-      %syntax- Func.calc(dataList,dataErrorLis(optuinal))
+      %syntax- [resultFunc resultFuncError]=Func.calc(dataList,dataErrorList(optional))
       %data List is a list of columns or rows, for example dataList={a b c}
-      %where a,b,c are either columns or rows
+      %where a,b,c are either columns or rows.
+      %errordataList is the same as dataList, only it is optional wether
+      %you wish to calculate error as well
           variables=symvar(self.func);
           if numel(dataList)~=numel(variables)
               error(['number of input parameters must be - ' num2str(numel(variables))]);
@@ -78,6 +78,17 @@ classdef Func
           resultFuncError=eval(funError);
           %evaluate string as if it was a command
       end
+      
+      function name=getName(self)
+      %returns the name of the function
+          name=self.name;
+      end
+      
+      function [funcVar errorVar]=getVariables(self)
+      %returns the variables of the function and the error function. to get
+      %the function variables type for example "fVars=func.getVariables" to
+      %get both function and error variables, type 
+          funcVar=self.
           
   end
 end  

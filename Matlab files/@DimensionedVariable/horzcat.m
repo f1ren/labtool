@@ -2,14 +2,20 @@ function vOut = horzcat(v1,v2)
 
 % --- ONLY  v1 is a dimensioned variable ------
 if(isa(v1,'DimensionedVariable') && ~isa(v2,'DimensionedVariable'))
-    vOut = NaN;
-    error('Unit inconsistency in addition');
+    arr{1}=v1;
+    for i=1:numel(v2)
+        arr{i+1}=v2{i};
+    end
+    vOut=arr;        
 end
 
 % --- ONLY  v2 is a dimensioned variable ------
 if(~isa(v1,'DimensionedVariable') && isa(v2,'DimensionedVariable'))
-    vOut = NaN;
-    error('Unit inconsistency in addition');
+    arr{1}=v2;
+    for i=1:numel(v1)
+        arr{i+1}=v1{i};
+    end
+    vOut=arr;    
 end
 
 %---- BOTH v1 and v2 are dimensioned variables -----
