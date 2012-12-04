@@ -1,12 +1,12 @@
-function deleteSheet(excelFileName, sheetName )
+function deleteSheet(excelFilePath, sheetName )
 if nargin<2
     error('must have at least 2 arguments\n');
 end
-excelFilePath = pwd; % Current working directory.
+
 
 % Open Excel file.
 objExcel = actxserver('Excel.Application');
-objExcel.Workbooks.Open(fullfile(excelFilePath, excelFileName)); % Full path is necessary!
+objExcel.Workbooks.Open(excelFilePath); % Full path is necessary!
 
 % Delete sheets.
 try

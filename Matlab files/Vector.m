@@ -44,10 +44,10 @@ classdef Vector
             if ~iscolumn(data)
                 data=data';
             end
-            if numel(unit)>0     
-                u=self.getUnitsStruct;
-                availableUnits=fieldnames(u);
-                [matchStart matches] = regexp(unit, '[a-z]+|[A-Z]','start','match');
+            if numel(unit)>0  
+                unitsStruct=self.getUnitsStruct;
+                availableUnits=fieldnames(unitsStruct);
+                [matchStart matches] = regexp(unit, '\w*','start','match');
                 matchIndex=getnameidx(availableUnits,matches);
                 if any(matchIndex==0)
                     unmatchedUnitsIndexes=find(matchIndex==0);
@@ -55,17 +55,17 @@ classdef Vector
                     error(['error, unit is not recognizable: "' firstUnmatched '"']);
                 end
                 if numel(matchStart)==1&&matchStart(1)==1
-                        st=['u.' unit];
+                        st=['unitsStruct.' unit];
                 else
                     if matchStart(1)==1
-                            st=['u.' unit(1:(matchStart(2)-1))];
+                            st=['unitsStruct.' unit(1:(matchStart(2)-1))];
                     else
                         st=unit(1:(matchStart(1)-1));
                     end
                     for i=1:(numel(matchStart)-1)
-                        st=[st 'u.' unit(matchStart(i):(matchStart(i+1)-1))];
+                        st=[st 'unitsStruct.' unit(matchStart(i):(matchStart(i+1)-1))];
                     end
-                     st=[st 'u.' unit(matchStart(numel(matchStart)):numel(unit))];
+                     st=[st 'unitsStruct.' unit(matchStart(numel(matchStart)):numel(unit))];
                 end
                 unitVal=eval(st);
             else
@@ -92,13 +92,13 @@ classdef Vector
         function num=getNum(self)
         %returns data in double type, this value is measured in the units
         %of the Vector.
-            num=self.data/self.unit;
+            num=u2num(self.data);
         end
         
         function errorNum=getErrorNum(self)
         %returns data error in double type, this value is measured in the units
         %of the Vector.
-            errorNum=self.dataError/self.unit;
+            errorNum=u2num(self.dataError);
         end
         
         

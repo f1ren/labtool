@@ -1,7 +1,7 @@
 classdef Experiment<handle
     %Experiment is an object that holds : vectors,
     %functions, etc... it provides easier access to those items and can do
-    %operations typical to a kab report.
+    %operations typical to a lab report.
     
     properties
         name % the name of the experiment
@@ -63,7 +63,8 @@ classdef Experiment<handle
             numberOfVectors=numel(headlines);
             while i<=numberOfVectors
                 headline=headlines{i};
-                dataVector=dataTable(:,1);
+                dataVector=dataTable(:,i);
+                dataVector=dataVector(~isnan(dataVector));
                 vectorName=char(regexp(headline,'^.*(?=\()','match'));%extracts the name 
                 vectorUnit=char(regexp(headline,'(?<=\()\w*(?=\))','match'));%extracts the unit from the brackets
                 if numel(vectorName)==0||numel(vectorUnit)==0;
@@ -71,7 +72,7 @@ classdef Experiment<handle
                 end
                 if i<numberOfVectors
                     if strcmp(headlines{i+1},'error')
-                        errorVector=dataTable(i+1);
+                        errorVector=dataTable(:,i+1);
                         self.add(Vector(vectorName,vectorUnit,dataVector,errorVector),vectorName);%add vector with error, on the condition that the next column headline is "error"
                         i=i+2;
                    
@@ -100,10 +101,38 @@ classdef Experiment<handle
             item=self.dict(itemName);
         end
         
-        function keys=getKeywords(self)
+        function keys=getList(self)
         %returns all keys in one array
             keys=self.dict.keys';
         end
+        
+        function keys=getFunctionList(self)
+        %returns all keys in array that are of type Func
+            allKeys=self.dict.keys;
+            values=self.dict.values;
+            keys={};
+            for i=1:numel(values)
+                allKeys{i};
+                if isa(values{i},'Func')
+                    keys=[keys allKeys{i}];
+                end
+            end
+            keys=keys';
+        end
+                
+        function keys=getVectorList(self)
+        %returns all keys in array that are of type Vector
+            allKeys=self.dict.keys;
+            values=self.dict.values;
+            keys={};
+            for i=1:numel(values)
+                allKeys{i};
+                if isa(values{i},'Vector')
+                    keys=[keys allKeys{i}];
+                end
+            end
+            keys=keys';
+        end                
         
         function [result resultError]=calc(self,funcKey,vectorKeys)
         %this function calculates a function(using Func class "calc" method"
