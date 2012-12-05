@@ -50,13 +50,13 @@ classdef Fit
       %get the name of the fit
           name=self.name;
       end   
-      function xName=getXname(self)
+      function xVector=getXvector(self)
       %get the name of the x field of the fit
-          xName=self.xVector.name;
+          xVector=self.xVector;
       end
-      function yName=getYname(self)
+      function yVector=getYvector(self)
       %get the name of the x field of the fit
-          yName=self.yVector.name;
+          yVector=self.yVector;
       end
       function model=getModel(self)
       %get the model of the fit

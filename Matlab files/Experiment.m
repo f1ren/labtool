@@ -3,7 +3,7 @@ classdef Experiment<handle
     %functions, etc... it provides easier access to those items and can do
     %operations typical to a lab report.
     
-    properties
+    properties(SetAccess=private)
         name % the name of the experiment
         dict % a dictionary that holds all fields of Experiment
     end
@@ -59,6 +59,9 @@ classdef Experiment<handle
                 [dataTable textTable]=xlsread(xlFile,sheetName);
             end
             headlines=textTable(1,:);
+            fullRows=~strcmp('',headlines); %find empty rows
+            headlines=headlines(fullRows); %delete empty rows from headlines
+            dataTable=dataTable(:,fullRows); %delete empty rows from dataTable 
             i=1;
             numberOfVectors=numel(headlines);
             while i<=numberOfVectors
@@ -66,9 +69,9 @@ classdef Experiment<handle
                 dataVector=dataTable(:,i);
                 dataVector=dataVector(~isnan(dataVector));
                 vectorName=char(regexp(headline,'^.*(?=\()','match'));%extracts the name 
-                vectorUnit=char(regexp(headline,'(?<=\()\w*(?=\))','match'));%extracts the unit from the brackets
+                vectorUnit=char(regexp(headline,'(?<=\().*(?=\))','match'));%extracts the unit from the brackets
                 if numel(vectorName)==0||numel(vectorUnit)==0;
-                    error(['name or unit of ' headline 'is not valid']);
+                    error(['name or unit of ' headline 'is not valid, format for headline is: "FieldName(unit)"']);
                 end
                 if i<numberOfVectors
                     if strcmp(headlines{i+1},'error')
