@@ -92,13 +92,21 @@ classdef Vector
         function num=getNum(self)
         %returns data in double type, this value is measured in the units
         %of the Vector.
-            num=u2num(self.data);
+            if isa(self.data, 'double')
+                num=self.data
+            else
+                num=u2num(self.data);
+            end
         end
         
         function errorNum=getErrorNum(self)
         %returns data error in double type, this value is measured in the units
         %of the Vector.
-            errorNum=u2num(self.dataError);
+            if isa(self.dataError, 'double')
+                errorNum=self.dataError
+            else
+                errorNum=u2num(self.dataError);
+            end
         end
         
         
