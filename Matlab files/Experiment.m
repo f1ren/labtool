@@ -157,7 +157,27 @@ classdef Experiment<handle
                 dataErrorList=[dataErrorList dataError];
             end
             [result resultError]=self.dict(funcKey).calc(dataList,dataErrorList);
+        end
+            
+        function plot(self,command,key1,key2)
+            %plots a graph by calling the autoPlot routine
+            %syntax - plot(command,key1,key2(optional))
+            %the syntax is the same as autoPlot(for more info type "help
+            %autoPlot", the only difference is that key1 and key2 are the
+            %keys to the wanted field instead of the field itself.
+            if nargin<2
+                error('not enough arguments given. remember syntax is plot(command,key1,key2(optional))');
+            elseif nargin==2
+                autoPlot(command);
+            elseif nargin==3
+                autoPlot(self.dict(key1));
+            elseif nargin==4
+                autoPlot(command,self.dict(key1),self.dict(key2));
+            else
+                error('too many arguments given. remember syntax is plot(command,key1,key2(optional))');
             end
+        end
+                
     end
     
         
