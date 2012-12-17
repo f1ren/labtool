@@ -5,6 +5,8 @@ from Table import Table
 excel = Dispatch("Excel.Application")
 
 TABLE_MASK = "table"
+SLOPE_MASK = "slope"
+INTERCEPT_MASK = "intercept"
 EVALUATION_MASK = ""
 
 def find(sheet, value):
@@ -25,6 +27,8 @@ def parseTable(handle):
 
     # Get table title
     title = inTable(1,2).Value
+    if title is None:
+        title = ""
 
     # Build table object
     outTable = Table(title)
@@ -49,12 +53,23 @@ def parseTable(handle):
         outTable.xValues.append(str(inTable(i, 3).Value))
         outTable.xErrors.append(str(inTable(i, 4).Value))
         i += 1
+        print inTable(i, 2).Value
 
     return outTable
 
 def parseActiveTalbe():
     activeSheet = excel.ActiveSheet
     return parseTable(find(activeSheet, TABLE_MASK))
+
+def setSlopeAndIntercept(s, i):
+    # Locate value cells
+    activeSheet = excel.ActiveSheet
+    slopeHandle = find(activeSheet, SLOPE_MASK)
+    interceptHandle = find(activeSheet, INTERCEPT_MASK)
+
+    # Update values
+    slopeHandle.Offset(1,2).Value = s
+    interceptHandle.Offset(1,2).Value = i
 
 if __name__ == "__main__":
     parseActiveTalbe()
