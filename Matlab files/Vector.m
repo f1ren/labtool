@@ -1,6 +1,7 @@
 
 classdef Vector
     %   This class implements a field of a one coloumn vector.
+    %syntax - Vector(name,unit,data,dataError(optional))
     properties(SetAccess=private)
         name  % the name of the vector
         unit  % the unit of the vector 
@@ -26,6 +27,7 @@ classdef Vector
         %name, unit, data, and data Error. name is saved as it is, while
         %data,error, and unit are changed to "Dimention Variable" type
         %which a type that considers the unit when computing.
+        %syntax - Vector(name,unit,data,dataError(optional))
             if nargin==3
                 dataError=zeros(numel(data),1);
             end
@@ -47,7 +49,7 @@ classdef Vector
             if numel(unit)>0  
                 unitsStruct=self.getUnitsStruct;
                 availableUnits=fieldnames(unitsStruct);
-                [matchStart matches] = regexp(unit, '\w*','start','match');
+                [matchStart matches] = regexp(unit, '[A-Za-z]','start','match');
                 matchIndex=getnameidx(availableUnits,matches);
                 if any(matchIndex==0)
                     unmatchedUnitsIndexes=find(matchIndex==0);
@@ -62,7 +64,7 @@ classdef Vector
                     else
                         st=unit(1:(matchStart(1)-1));
                     end
-                    for i=1:(numel(matchStart)-1)
+                    for i=2:(numel(matchStart)-1)
                         st=[st 'unitsStruct.' unit(matchStart(i):(matchStart(i+1)-1))];
                     end
                      st=[st 'unitsStruct.' unit(matchStart(numel(matchStart)):numel(unit))];
