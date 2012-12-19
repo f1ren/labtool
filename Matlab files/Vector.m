@@ -49,7 +49,7 @@ classdef Vector
             if numel(unit)>0  
                 unitsStruct=self.getUnitsStruct;
                 availableUnits=fieldnames(unitsStruct);
-                [matchStart matches] = regexp(unit, '[A-Za-z]','start','match');
+                [matchStart matches] = regexp(unit, '[A-Za-z]*','start','match');
                 matchIndex=getnameidx(availableUnits,matches);
                 if any(matchIndex==0)
                     unmatchedUnitsIndexes=find(matchIndex==0);
