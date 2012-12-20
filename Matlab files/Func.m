@@ -5,6 +5,7 @@ classdef Func
       name % The name of the function
       func % The function itself  as a symbolic type
       funcError % The function error itself as a symbolic type
+
   end
 
   methods
@@ -28,6 +29,10 @@ classdef Func
               error('function must be either type "sym" or "char"')
           end
           self.funcError=calcError(self.func);
+          fprintf('\nfunction preview:\n')
+          pretty(self.func);
+          fprintf('\nvariable list in order:\n')
+          disp(symvar(self.func));
       end
       
       function disp(self)
@@ -35,7 +40,7 @@ classdef Func
           errLatex=regexprep(latex(self.funcError),'z_','\\Delta_');% a small fix to make "z_" error character to"\delta_"
           fprintf('$function "%s":\nfunction(char):\n%s\nfunction(latex):\n%s\nfunction error(char):\n%s\nfunction error(latex):\n%s\n',self.name,char(self.func),latex(self.func),errChar,errLatex);
       end
-      function [resultFunc resultFuncError]=calc(self,dataList,dataErrorList)
+      function [resultFunc resultFuncError]=calc(self,vectorList)
       %calculate the function by giving it parameters
       %syntax- [resultFunc resultFuncError]=Func.calc(dataList,dataErrorList(optional))
       %data List is a list of columns or rows, for example dataList={a b c}
@@ -45,21 +50,16 @@ classdef Func
       %NOTICE - it is very important to keep the input lists syncronous to
       %those of the function, to see the right order use the "getVariables"
       %method
+          if nargin<2
+              error('not enugh arguments given, syntax is as following: Func.calc(vectorList)');
+          end
+          if ~isa(vectorList,'Vector')
+              error('argument must be an array of Vectors, syntax is as following: Func.calc(vectorList)');
+          end
           variables=symvar(self.func);
-          if numel(dataList)~=numel(variables)
+          if numel(vectorList)~=numel(variables)
               error(['number of input parameters(function input) must be - ' num2str(numel(variables))]);
-          end
-          if nargin<3
-              for i=1:numel(variables)
-                  dataErrorList{i}=0;
-              end
-              %if no error parameters have been given, then zero all
-              %parameters since the error is 0
-          else
-              if numel(dataErrorList)<numel(variables)
-                  error(['number of input error parameters(function input) must be - ' num2str(numel(variables))]);
-              end
-          end
+          end        
           %change the function and the function error operations to
           %"cell to cell" operations
           fun=char(self.func);
@@ -70,11 +70,11 @@ classdef Func
           funError=strrep(funError,'*','.*');
           funError=strrep(funError,'^','.^');
           funError=strrep(funError,'/','./');
-          for i=1:numel(dataList)
+          for i=1:numel(vectorList)
             var=char(variables(i));
-            fun=regexprep(fun,['\<' var '\>'],['dataList{' num2str(i) '}']);
-            funError=regexprep(funError,['\<' var '\>'],['dataList{' num2str(i) '}']);
-            funError=regexprep(funError,['\<' 'z_' var '\>'],['dataErrorList{' num2str(i) '}']);
+            fun=regexprep(fun,['\<' var '\>'],['vectorList(' num2str(i) ').get']);
+            funError=regexprep(funError,['\<' var '\>'],['vectorList(' num2str(i) ').get']);
+            funError=regexprep(funError,['\<' 'z_' var '\>'],['vectorList(' num2str(i) ').getError']);
             %replace variable with parameter
           end
           resultFunc=eval(fun);
@@ -86,7 +86,7 @@ classdef Func
       %returns the name of the function
           name=self.name;
       end
-      
+
       function funcVar=getVariables(self)
       %returns the variables of the function 
           funcVar=symvar(self.func);

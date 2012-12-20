@@ -6,6 +6,10 @@ classdef Experiment<handle
     properties(SetAccess=private)
         name % the name of the experiment
         dict % a dictionary that holds all fields of Experiment
+        sheets %Saves the full path and sheet name each time a user uses "addSheet".
+                %this list of sheets is used in "update" command which uses
+                %"add sheet" on all this sheets(which means that it updates the experiment
+                %to changes in excel files.
     end
     
     methods
@@ -20,6 +24,7 @@ classdef Experiment<handle
             if nargin<1
                 error('upon construction the Experiment name must be provided')
             end
+            sheets={};
             self.name=name;
             self.dict=containers.Map;
             if nargin==2
@@ -44,6 +49,26 @@ classdef Experiment<handle
             end
         end
         
+        function remove(self,key)
+            remove(self.dict,key)
+        end
+        
+        function addVectorByFunc(self,name,funcKey,vectorKeys)
+        %this function adds a vector by using parameters on a function
+        %in Experiment. syntax is Func.addVectorByFunc(self,name,funcKey,vectorKeys)
+            [val err]=self.calc(funcKey,vectorKeys);
+            if strcmp(class(val),'DimensionedVariable')
+                [crap unit]=unitsOf(val);
+                unit=unit(2:numel(unit)-1);
+                unit=char(sym(regexprep(unit,'][','*')));
+                val=u2num(val);
+                err=u2num(err);
+            elseif strcmp(class(val),'double')
+                unit='';
+            end 
+            self.add(Vector(name,unit,val,err));
+        end
+          
         function addSheet(self,xlFile,sheetName)
         %interperts an excel sheet and stores it in Experiment's
         %dictionary. the interpertation is as following:
@@ -68,17 +93,21 @@ classdef Experiment<handle
                 headline=headlines{i};
                 dataVector=dataTable(:,i);
                 dataVector=dataVector(~isnan(dataVector));
-                vectorName=char(regexp(headline,'^.*(?=\()','match'));%extracts the name 
-                vectorUnit=char(regexp(headline,'(?<=\().*(?=\))','match'));%extracts the unit from the brackets
-                if numel(vectorName)==0||numel(vectorUnit)==0;
-                    error(['name or unit of ' headline 'is not valid, format for headline is: "FieldName(unit)"']);
+                vectorUnit=char(regexp(headline,'(?<=\().*(?=\))','match'));  %extracts the unit from the brackets
+                if numel(vectorUnit)==0
+                    vectorName=headline;  %extracts the name 
+                else
+                    vectorName=char(regexp(headline,'^.*(?=\()','match'));  %extracts the name 
+                end
+                if numel(vectorName)==0;
+                    error(['name or unit of "' headline '" is not valid, format for headline is: "FieldName(unit)", if unitless then format is "fieldName"']);
                 end
                 if i<numberOfVectors
                     if strcmp(headlines{i+1},'error')
                         errorVector=dataTable(:,i+1);
+                       	errorVector=errorVector(~isnan(errorVector));
                         self.add(Vector(vectorName,vectorUnit,dataVector,errorVector),vectorName);%add vector with error, on the condition that the next column headline is "error"
                         i=i+2;
-                   
                     else
                         self.add(Vector(vectorName,vectorUnit,dataVector),vectorName);%add without error
                         i=i+1;  
@@ -87,7 +116,17 @@ classdef Experiment<handle
                     self.add(Vector(vectorName,vectorUnit,dataVector),vectorName); %add without error(edge of iteration handeling)
                     i=i+1;
                 end
-            end       
+            end
+            sheetStruct.fullPath=xlFile;
+            sheetStruct.name=sheetName;
+            self.sheets=[self.sheets sheetStruct];
+        end
+        
+        function update(self)
+        %updates data from all excel sheets that has been added
+            for sheet=self.sheets
+                self.addSheet(sheet.fullPath,sheet.name)
+            end
         end
         
         function disp(self) 
@@ -144,19 +183,15 @@ classdef Experiment<handle
         %funcKey - the key of the function to calculate
         %vectorKeys - is an array of the keys of the vectors you wish to
         %             calculate.       
-            dataList={};
-            dataErrorList={};
             for i=1:numel(vectorKeys)
                 key=vectorKeys{i};
                 item=self.dict(key);
                 if strcmp(class(item),'Vector')==0
                     error('vectorKeys must direct to Vector items');
                 end
-                [data dataError]=item.get;
-                dataList=[dataList data];
-                dataErrorList=[dataErrorList dataError];
+                vectorList(i)=item;
             end
-            [result resultError]=self.dict(funcKey).calc(dataList,dataErrorList);
+            [result resultError]=self.dict(funcKey).calc(vectorList);
         end
             
         function plot(self,command,key1,key2)

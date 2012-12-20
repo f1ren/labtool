@@ -75,6 +75,7 @@ classdef Vector
             end
             self.unit=unitVal;
             self.data=data*unitVal;
+            self.data
             self.dataError=dataError*unitVal;
             self.name=name;
         end
@@ -91,11 +92,14 @@ classdef Vector
             data=self.data;
             dataError=self.dataError;
         end
+        function err=getError(self)
+            err=self.dataError;
+        end
         function num=getNum(self)
         %returns data in double type, this value is measured in the units
         %of the Vector.
             if isa(self.data, 'double')
-                num=self.data
+                num=self.data;
             else
                 num=u2num(self.data);
             end
@@ -105,7 +109,7 @@ classdef Vector
         %returns data error in double type, this value is measured in the units
         %of the Vector.
             if isa(self.dataError, 'double')
-                errorNum=self.dataError
+                errorNum=self.dataError;
             else
                 errorNum=u2num(self.dataError);
             end
@@ -116,12 +120,13 @@ classdef Vector
         %returns the value of the unit as a dimensioned variable
             if strcmp(class(self.data),'DimensionedVariable')
                 [crap un]=unitsOf(self.data);
-                un=un(units2:numel(un)-1);
+                un=un(2:numel(un)-1);
                 uni=char(sym(regexprep(un,'][','*')));
             elseif strcmp(class(self.data),'double')
                 uni='';
             end   
-        end          
+        end 
+
     end   
 end
 
