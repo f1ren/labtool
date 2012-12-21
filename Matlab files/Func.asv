@@ -2,10 +2,12 @@ classdef Func
   %This class implements a function. upon construction it calculates the
   %error propogation function.
     %<a href="matlab:help Func.Func ">Func</a>
-    %<a href="matlab:help Func.calc ">calc</a>
     %<a href="matlab:help Func.getName ">getName</a>
-    %<a href="matlab:help Func.getVariables ">getVariables</a>
-
+    %<a href="matlab:help Func.get ">get</a>
+    %<a href="matlab:help Func.getError ">getError</a>
+    %<a href="matlab:help Func.getNum ">getNum</a>
+    %<a href="matlab:help Func.getErrorNum ">getErrorNum</a>
+    %<a href="matlab:help Func.getUnit ">getUnit</a>
   properties(SetAccess=private)
       name % The name of the function
       func % The function itself  as a symbolic type
@@ -17,9 +19,8 @@ classdef Func
       function self=Func(name,func)
       %function Func:
       %Constructs a function instance and calculates and store function error
-      %syntax: Func(name,func)
-      %where func is a symbolic of the function, or a char array and name
-      %is the name of the function
+      %syntax Func(name,func)
+      %where func is a symbolic of the function, or a char array
           if nargin<2
               error('must recieve at least two parametes - (name,function)')
           end
@@ -53,7 +54,7 @@ classdef Func
       %syntax- [resultFunc resultFuncError]=Func.calc(dataList,dataErrorList(optional))
       %data List is a list of columns or rows, for example dataList={a b c}
       %where a,b,c are either columns or rows.
-      %errordataList is the same as dataList, only it is optional whether
+      %errordataList is the same as dataList, only it is optional wether
       %you wish to calculate error as well.
       %NOTICE - it is very important to keep the input lists syncronous to
       %those of the function, to see the right order use the "getVariables"
@@ -99,7 +100,7 @@ classdef Func
 
       function funcVar=getVariables(self)
       %function  getVariables
-      %returns the variables of the function in their right order
+      %returns the variables of the function 
       %syntax Func.getVariables
           funcVar=symvar(self.func);
       end

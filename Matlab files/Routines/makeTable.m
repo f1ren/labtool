@@ -28,13 +28,21 @@ for i=1:numel(vectorList)
     if ~isa(vector,'Vector')
         error('vector list must be composed of Vector type only')
     end
-    [garbadge unit]=unitsOf(vector.unit);
-    headlines{j}=[vector.name '(' unit ')'];
+    unit=vector.getUnit;
+    if numel(unit)>0
+        headlines{j}=[vector.name '(' unit ')'];
+    else
+        headlines{j}=vector.name;
+    end
     data=num2cell(vector.getNum);
     table(1:numel(data),j)=data;   
     j=j+1;
     dataError=num2cell(vector.getErrorNum);
-    headlines{j}='error';
+    if numel(unit)>0
+        headlines{j}=['error' '(' unit ')'];
+    else
+        headlines{j}='error';
+    end
     table(1:numel(dataError),j)=dataError;
     j=j+1;
 end

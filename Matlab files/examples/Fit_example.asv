@@ -6,9 +6,5 @@ myExperiment.addSheet(fullPath,sheetName); %add the sheet to Experiment
 fitName='myFit';
 myFit=Fit(fitName,'poly1',myExperiment.get('angle'),myExperiment.get('intensity'));
 
-autoplot('new',myFit); %plots the fit
-fprintf('goodness of fit\n');
-myFit.getGoodness
-fprintf('fit result\n');
-myFit.getFit
+autoplot('new',myFit);
 

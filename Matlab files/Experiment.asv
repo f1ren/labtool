@@ -136,7 +136,6 @@ classdef Experiment<handle
                 else
                     self.add(Vector(vectorName,vectorUnit,dataVector),vectorName); %add without error(edge of iteration handeling)
                     i=i+1;
-                    disp('pips')
                 end
             end
             sheetStruct.fullPath=xlFile;

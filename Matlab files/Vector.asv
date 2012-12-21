@@ -1,7 +1,7 @@
 
 classdef Vector
     %   This class implements a field of a one coloumn vector.
-    %<a href="matlab:help Vector.Vector ">Vector</a>
+    %
     %<a href="matlab:help Vector.getName ">getName</a>
     %<a href="matlab:help Vector.get ">get</a>
     %<a href="matlab:help Vector.getError ">getError</a>
@@ -82,7 +82,7 @@ classdef Vector
             end
             self.unit=unitVal;
             self.data=data*unitVal;
-            self.data;
+            self.data
             self.dataError=dataError*unitVal;
             self.name=name;
         end

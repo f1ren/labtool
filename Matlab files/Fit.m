@@ -2,6 +2,13 @@ classdef Fit
   %This Class implements a fit, using a general model of a
   %function with unknown coefficcients, and data vectors the coeeffiecients
   %can be calculated.
+    %available method are: 
+    %<a href="matlab:help Fit.Fit ">Fit</a>
+    %<a href="matlab:help Fit.getName ">getName</a>
+    %<a href="matlab:help Fit.getXvector ">getXvector</a>
+    %<a href="matlab:help Fit.getYvector ">getYvector</a>
+    %<a href="matlab:help Fit.getGoodness ">getGoodness</a>
+    %<a href="matlab:help Fit.getFit ">getFit</a>
   properties(SetAccess=private)
       name
       fitModel
@@ -14,9 +21,11 @@ classdef Fit
   %fitModel - the function model. to see model options, type "cflibhelp"
   methods
       function self=Fit(name,fitModel,xVector,yVector)
+      %function Fit:
       %constructs a fit objects and goodness of fit struct, and stores the fields 
       %that generated it.
-      %**to see possible options for fitModel, type cflibhelp
+      %constructor syntax: Fit(name,fitModel,xVector,yVector)
+      %p.s. to see possible options for fitModel, type cflibhelp
           if nargin<2
               error('must recieve at least two parametes - (name,Fit Model,x vector,y vector)')
           end
@@ -47,27 +56,39 @@ classdef Fit
           disp(self.gof);         
       end 
       function name=getName(self)
+      %function getName:
       %get the name of the fit
+      %syntax: Fit.getName
           name=self.name;
       end   
       function xVector=getXvector(self)
+      %function getXvector:
       %get the name of the x field of the fit
+      %syntax: Fit.getXvector
           xVector=self.xVector;
       end
       function yVector=getYvector(self)
+      %function getYvector:
       %get the name of the x field of the fit
+      %syntax: Fit.getYvector
           yVector=self.yVector;
       end
       function model=getModel(self)
+      %function getModel:
       %get the model of the fit
+      %syntax: Fit.getModel
           model=self.fitModel;
       end
-     function gof=getgof(self)
+     function gof=getGoodness(self)
+      %function getGoodness:
       %get the goodness of the fit
+      %syntax: Fit.getGoodness
           gof=self.gof;
      end
      function fitResult=getFit(self)
+      %function getFit:
       %get the fit result
+      %syntax: Fit.fitResult
           fitResult=self.fitResult;
      end
           
