@@ -2,11 +2,6 @@ myExperiment=Experiment('my experiment title'); %create an instance of Experimen
 fullPath='C:\Users\TUVAL\Google Drive\MATLAB\examples\polarization results.xlsx';
 sheetName='Malus';
 myExperiment.addSheet(fullPath,sheetName); %add the sheet to Experiment
-fprintf('angle from excel file:\n')
-myExperiment.get('angle').data
-fprintf('angle error from excel file:\n')
-myExperiment.get('angle').dataError
-
 functionName='my func';
 func='cos(x)';
 myExperiment.add(Func(functionName,func)); %add a function to Experiment

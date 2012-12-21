@@ -1,0 +1,1 @@
+for examples to work properly please work in this shell: you open the matlam.m file
